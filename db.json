@@ -1,0 +1,20 @@
+{
+  "products": [
+    {
+      "id": "81f465b9-2091-412d-b168-578f79a1d2d2",
+      "name": "Torneira Elétrica",
+      "description": "Fácil instalação e garantia 1 ano",
+      "quantity": "10",
+      "isActive": true,
+      "createdAt": "2025-10-11T13:18:56.353Z"
+    },
+    {
+      "id": "9cf14fa4-8848-4098-bb3c-1e63046bc1d3",
+      "name": "Panela Rochedo Vermelho",
+      "description": "Revestimento Antiaderente Resist: Reforçado com partículas minerais, evita que os alimentos grudem e garante maior durabilidade. Facilita a limpeza e proporciona um uso mais prático no dia a dia, tornando o preparo de seu alimento ainda mais eficiente.",
+      "quantity": "10",
+      "isActive": true,
+      "createdAt": "2025-10-11T16:05:42.262Z"
+    }
+  ]
+}
