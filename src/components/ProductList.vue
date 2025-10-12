@@ -10,8 +10,8 @@
   <q-page padding class="q-pa-md">
     <q-card class="q-mx-xl q-ma-md">
       <q-card-section>
-        <q-form @submit.prevent="handleSubmit" class="q-gutter-md">
-          <q-input v-model="form.name" label="Produto" outlined />
+        <q-form ref="formRef" @submit.prevent="handleSubmit" class="q-gutter-md">
+          <q-input v-model="form.name" label="Produto" outlined :rules="[val => val.length > 0 || 'Insira um nome de produto']" hide-bottom-space />
           <q-input v-model="form.description" label="Descrição" outlined />
           <q-input v-model="form.quantity" label="Quantidade" type="number" outlined />
           <q-btn type="submit" :label="editId ? 'Atualizar' : 'Adicionar'" color="primary" />
@@ -26,16 +26,16 @@
       </template>
     </q-input>
 
-    <q-card v-if="productStore.isLoading" class="q-ma-md">
+    <q-card v-if="productStore.isLoading" class="q-ma-xl">
       <q-card-section>
-        Carregando...
+        <TodoSpinner class="" />
       </q-card-section>
     </q-card>
 
     <q-list v-else class="q-mx-xl q-ma-md">
-      <q-item v-for="product in filteredProducts" :key="product.id" clickable @click="viewProduct(product)">
+      <q-item v-for="product in filteredProducts" :key="product.id" clickable>
 
-        <q-item-section>
+        <q-item-section clickable @click="viewProduct(product)">
           <div class="text-subtitle1">
             <b>Produto: </b>{{ product.name }}
           </div>
@@ -66,6 +66,7 @@
           </q-card-section>
 
           <q-space />
+          <q-separator spaced />
 
           <q-card-actions align="between">
             <div class="text-italic text-blue-grey-10 text-left">Criado em {{ formattedDate }}</div>
@@ -84,8 +85,11 @@ let dataAtual = new Date()
 import { ref, onMounted, computed } from "vue";
 import { useProductStore } from "../stores/productStore";
 import type { Product } from "../models/Product";
+import TodoSpinner from "./TodoSpinner.vue";
+import { QForm } from "quasar";
 
 const productStore = useProductStore();
+const formRef = ref<QForm | null>(null)
 const form = ref<Product>({ id: "", name: "", description: "", quantity: 0, createdAt: dataAtual });
 const editId = ref<string | null>(null);
 const showModal = ref(false)
@@ -118,6 +122,7 @@ function handleSubmit() {
     productStore.addProduct(form.value);
   }
   form.value = { id: "", name: "", description: "", quantity: 0, createdAt: dataAtual };
+  formRef.value?.reset();
   editId.value = null;
 }
 

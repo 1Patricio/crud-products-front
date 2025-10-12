@@ -3,7 +3,6 @@ import type { Product } from '../models/Product';
 import api from '../api/api';
 import { v4 as uuidv4 } from 'uuid';
 
-
 export const useProductStore = defineStore('productStore', {
     state: () => ({
         products: [] as Product[],
@@ -15,6 +14,8 @@ export const useProductStore = defineStore('productStore', {
         async getProducts() {
             this.isLoading = true;
             try {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
                 const res = await api.get<Product[]>('products');
                 this.products = res.data;
             } catch (err: any) {
