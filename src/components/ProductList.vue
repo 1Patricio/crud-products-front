@@ -28,7 +28,7 @@
 
     <q-card v-if="productStore.isLoading" class="q-ma-xl">
       <q-card-section>
-        <TodoSpinner class="" />
+        <TodoSpinner />
       </q-card-section>
     </q-card>
 

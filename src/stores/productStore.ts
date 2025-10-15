@@ -14,8 +14,6 @@ export const useProductStore = defineStore('productStore', {
         async getProducts() {
             this.isLoading = true;
             try {
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
                 const res = await api.get<Product[]>('products');
                 this.products = res.data;
             } catch (err: any) {

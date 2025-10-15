@@ -1,14 +1,14 @@
 <template>
     <q-header elevated>
         <q-toolbar style="background-color: #348A65;">
-            <q-icon name="arrow_back" class="cursor-pointer q-ml-lg" size="16px" @click="$router.back()"></q-icon>
+            <q-icon name="arrow_back" class="cursor-pointer q-ml-lg" size="16px" @click="$router.push('/')"></q-icon>
             <q-toolbar-title class="text-center text-bold">Inmeta</q-toolbar-title>
             <div style="width: 40px;"></div>
         </q-toolbar>
     </q-header>
     <q-card v-if="productStore.isLoading" class="q-ma-md">
         <q-card-section>
-            Carregando...
+            <TodoSpinner />
         </q-card-section>
     </q-card>
 
@@ -29,6 +29,7 @@
 import { useRoute } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import { useProductStore } from '../stores/productStore'
+import TodoSpinner from './TodoSpinner.vue'
 
 const route = useRoute()
 const productStore = useProductStore()
