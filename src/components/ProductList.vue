@@ -122,20 +122,6 @@
         </q-item-section>
         <q-separator spaced />
       </q-item>
-
-      <q-dialog v-model="showModal" persistent>
-        <q-card style="width: 400px; height: 520px; display: flex; flex-direction: column;">
-
-          <q-space />
-          <q-separator spaced />
-
-          <q-card-actions align="between">
-            <div class="text-italic text-blue-grey-10 text-left">Criado em {{ formattedDate }}</div>
-            <q-btn flat label="Fechar" color="primary" v-close-popup />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-
     </q-list>
   </q-page>
 </template>
@@ -186,15 +172,15 @@ function viewProduct(product: Product) {
   $q.dialog({
     persistent:true,
     html: true, 
-    style: "width: 400px; height: 520px; display: flex; flex-direction: column;",
+    style: "width: 540px; height: 620px; display: flex; flex-direction: column; justify-content: flex-end;",
     title: `<h6 class="text-center q-ma-md">${product.name}</h6> <hr/>`,
     message: `
-    <div style = "height: 340px">
-      <div style = "margin-bottom: 20px; max-width: 400px; word-break: break-word;">
+    <div style = "height: 440px">
+      <div style = "margin-bottom: 20px; word-break: break-word;">
         <b>Quantidade:</b> ${product.quantity}<br>
         <b>Descrição:</b> ${product.description}
       </div>
-      <div style="margim-top: 100%">
+      <div>
         <hr/>
         <div style = "font-style: italic; color: grey; align-items: end;">
           Criado em ${formattedDate.value}
