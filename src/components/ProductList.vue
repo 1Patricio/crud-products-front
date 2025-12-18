@@ -42,8 +42,10 @@
           />
           <q-input
             outlined 
+            hide-bottom-space
             v-model="form.description" 
             label="Descrição" 
+            :rules="[(val: string) => val.length < 800 || 'Limite de 800 caracteres']" 
           />
           <q-input 
             outlined
@@ -233,7 +235,23 @@ function editProduct(product: Product) {
 }
 
 function deleteProduct(id: string) {
-  productStore.deleteProduct(id);
+  $q.dialog({
+    title: 'Confirmação Necessária',
+    message: 'Tem certeza de que deseja deletar este item?',
+    cancel: {
+      label: 'Cancelar',
+      color: 'primary',
+      outline: true,
+    },
+    ok: {
+      label: 'Deletar',
+      color: 'negative',
+      push: true,
+    },
+    persistent: true, 
+  }).onOk(() => {
+    productStore.deleteProduct(id)
+  })
 }
 
 async function logout(){
