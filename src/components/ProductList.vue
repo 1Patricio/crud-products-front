@@ -143,7 +143,6 @@ const productStore = useProductStore();
 const formRef = ref<QForm | null>(null)
 const form = ref<Product>({ id: "", name: "", description: "", quantity: 0, createdAt: dataAtual, createdByUser: usuarioLogado!.value?.id! });
 const editId = ref<string | null>(null);
-const showModal = ref(false)
 const selectedItem = ref<Product | null>(null)
 const formattedDate = ref("")
 const search = ref("")
