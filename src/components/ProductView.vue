@@ -1,9 +1,13 @@
 <template>
     <q-header elevated>
         <q-toolbar style="background-color: #348A65;">
-            <q-icon name="arrow_back" class="cursor-pointer q-ml-lg" size="16px" @click="$router.push('/')"></q-icon>
+            <q-icon 
+              name="arrow_back" 
+              class="cursor-pointer q-ml-lg" 
+              size="16px" 
+              @click="$router.push('/')"
+            />
             <q-toolbar-title class="text-center text-bold">Inmeta</q-toolbar-title>
-            <div style="width: 40px;"></div>
         </q-toolbar>
     </q-header>
     <q-card v-if="productStore.isLoading" class="q-ma-md">
