@@ -17,7 +17,7 @@ export const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const auth = useAuthStore();
   const isAuth = auth.isAuthenticated();
 
