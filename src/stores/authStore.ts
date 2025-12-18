@@ -36,13 +36,11 @@ export const useAuthStore = defineStore("authStore", () => {
       return res.data;
     } catch (err: any) {
       if (err.code == "ERR_BAD_REQUEST") {
-        console.log(err)
         error.value = "Credenciais Inválidas";
       } else {
         error.value =
           err?.response?.data?.message || err.message || "Erro no login";
       }
-      console.log(error.value);
       throw new Error(error.value!);
     }
   }
@@ -51,7 +49,6 @@ export const useAuthStore = defineStore("authStore", () => {
     error.value = null;
 
     try {
-      console.log("Nome: " + nome, " Email: " + email)
       const res = await api.post("/auth/register", {
         nome,
         email,
@@ -71,11 +68,7 @@ export const useAuthStore = defineStore("authStore", () => {
 
         return res.data;
       } catch (err: any) {
-              console.log('Erro: ' + err.response.value)
-      console.log('Erro: ' + err.response)
-      console.log('Erro: ' + err.error)
         if (err.code == "ERR_BAD_REQUEST") {
-          console.log(err)
           error.value = "Credenciais Inválidas";
         } else {
           error.value =
@@ -114,7 +107,6 @@ export const useAuthStore = defineStore("authStore", () => {
       const res = await api.get("/auth/me");
 
       user.value = res.data.user;
-      console.log(user.value)
       return user.value;
     } catch (err: any) {
       await logout();
