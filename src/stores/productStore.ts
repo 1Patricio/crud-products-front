@@ -1,74 +1,82 @@
-import { defineStore } from 'pinia';
-import type { Product } from '../models/Product';
-import api from '../api/api';
-import { v4 as uuidv4 } from 'uuid';
+import { defineStore } from "pinia";
+import type { Product } from "../models/Product";
+import api from "../api/api";
+import { ref } from "vue";
 
-export const useProductStore = defineStore('productStore', {
-    state: () => ({
-        products: [] as Product[],
-        isLoading: false,
-        error: null as string | null
-    }),
+export const useProductStore = defineStore("productStore", () => {
+  const products = ref<Product[]>([]);
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
 
-    actions: {
-        async getProducts() {
-            this.isLoading = true;
-            try {
-                const res = await api.get<Product[]>('products');
-                this.products = res.data;
-            } catch (err: any) {
-                this.error = err.message;
-            } finally {
-                this.isLoading = false
-            }
-        },
+  async function getProducts() {
+    isLoading.value = true;
+    try {
+      const res = await api.get<Product[]>("products");
+      products.value = res.data;
+    } catch (err: any) {
+      error.value = err.message;
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-        async getProductById(id: string) {
-            this.isLoading = true;
-            try {
-                const res = await api.get<Product>(`products/${id}`);
-                const index = this.products.findIndex((u) => u.id === id)
+  async function getProductById(id: string) {
+    isLoading.value = true;
+    try {
+      const res = await api.get<Product>(`products/${id}`);
+      const index = products.value.findIndex((p) => p.id === id);
 
-                if (index !== -1) {
-                    this.products[index] = res.data;
-                }
+      if (index !== -1) {
+        products.value[index] = res.data;
+      }
 
-                return res.data;
-            } catch (err: any) {
-                this.error = err.message;
-            } finally {
-                this.isLoading = false
-            }
-        },
+      return res.data;
+    } catch (err: any) {
+      error.value = err.message;
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-        async addProduct(product: Product) {
-            try {
-                product.id = uuidv4();
-                let res = await api.post<Product>('products', product);
+  async function addProduct(product: Product) {
+    try {
+      const res = await api.post<Product>("products", product);
+      products.value.push(res.data);
+    } catch (err: any) {
+      error.value = err.message;
+    }
+  }
 
-                this.products.push(res.data);
-            } catch (err: any) {
-                this.error = err.message;
-            }
-        },
+  async function editProduct(id: string, updatedProduct: Product) {
+    try {
+      const res = await api.put<Product>(`products/${id}`, updatedProduct);
+      const index = products.value.findIndex((p) => p.id === id);
 
-        async editProduct(id: string, editProduct: Product) {
-            try {
-                const res = await api.put<Product>(`products/${id}`, editProduct);
-                const index = this.products.findIndex((u) => u.id === id);
-                if (index !== -1) this.products[index] = res.data;
-            } catch (err: any) {
-                this.error = err.message;
-            }
-        },
+      if (index !== -1) {
+        products.value[index] = res.data;
+      }
+    } catch (err: any) {
+      error.value = err.message;
+    }
+  }
 
-        async deleteProduct(id: string) {
-            try {
-                await api.delete<Product>(`products/${id}`);
-                this.products = this.products.filter((u) => u.id !== id)
-            } catch (err: any) {
-                this.error = err.message;
-            }
-        },
-    },
-})
+  async function deleteProduct(id: string) {
+    try {
+      await api.delete(`products/${id}`);
+      products.value = products.value.filter((p) => p.id !== id);
+    } catch (err: any) {
+      error.value = err.message;
+    }
+  }
+
+  return {
+    products,
+    isLoading,
+    error,
+    getProducts,
+    getProductById,
+    addProduct,
+    editProduct,
+    deleteProduct,
+  };
+});

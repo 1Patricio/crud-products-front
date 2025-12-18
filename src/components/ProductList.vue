@@ -1,9 +1,31 @@
 <template>
   <q-header elevated>
-    <q-toolbar style="background-color: #348A65;">
+    <q-toolbar class="q-pa-md" style="background-color: #348A65;">
+      <q-btn 
+        flat 
+        round 
+        dense 
+        icon="assignment_ind"
+      >
+        <q-menu>
+          <div class="row no-wrap q-pa-md column items-center">
+            <p class="text-subtitle1 q-mt-md q-mb-xs">{{ usuarioLogado?.nome }}</p>
+            <q-btn 
+              v-close-popup 
+              push 
+              color="primary" 
+              label="Sair" 
+              size="sm" 
+              @click="logout()"
+            />
+          </div>
+        </q-menu>
+      </q-btn>
+
       <q-toolbar-title class="text-center text-bold">
         Inmeta
       </q-toolbar-title>
+
     </q-toolbar>
   </q-header>
 
@@ -11,16 +33,47 @@
     <q-card class="q-mx-xl q-ma-md">
       <q-card-section>
         <q-form ref="formRef" @submit.prevent="handleSubmit" class="q-gutter-md">
-          <q-input v-model="form.name" label="Produto" outlined :rules="[val => val.length > 0 || 'Insira um nome de produto']" hide-bottom-space />
-          <q-input v-model="form.description" label="Descrição" outlined />
-          <q-input v-model="form.quantity" label="Quantidade" type="number" outlined />
-          <q-btn type="submit" :label="editId ? 'Atualizar' : 'Adicionar'" color="primary" />
-          <q-btn v-if="editId" label="Cancelar" color="orange" type="cancel"></q-btn>
+          <q-input 
+            outlined
+            hide-bottom-space
+            v-model="form.name" 
+            label="Produto" 
+            :rules="[(val: string) => val.length > 0 || 'Insira um nome de produto']" 
+          />
+          <q-input
+            outlined 
+            v-model="form.description" 
+            label="Descrição" 
+          />
+          <q-input 
+            outlined
+            v-model="form.quantity" 
+            label="Quantidade" 
+            type="number"  
+          />
+          <q-btn 
+            type="submit" 
+            :label="editId ? 'Atualizar' : 'Adicionar'" 
+            color="primary" 
+          />
+          <q-btn 
+            v-if="editId" 
+            label="Cancelar" 
+            color="orange" 
+            type="cancel"
+          />
         </q-form>
       </q-card-section>
     </q-card>
 
-    <q-input outlined dense v-model="search" label="Buscar por nome" class="bg-white q-px-xl" style="width: 400px;">
+    <q-input 
+      outlined 
+      dense 
+      v-model="search" 
+      label="Buscar por nome" 
+      class="bg-white q-px-xl" 
+      style="width: 400px;"
+    >
       <template v-slot:prepend>
         <q-icon name="search" />
       </template>
@@ -49,8 +102,20 @@
 
         <q-item-section side>
           <div class="row items-center q-gutter-sm">
-            <q-btn flat round icon="edit" color="orange" @click="editProduct(product)" />
-            <q-btn flat round icon="delete" color="negative" @click="() => deleteProduct(product.id)" />
+            <q-btn 
+              flat 
+              round 
+              icon="edit" 
+              color="orange" 
+              @click="editProduct(product)" 
+            />
+            <q-btn 
+              flat 
+              round 
+              icon="delete" 
+              color="negative" 
+              @click="() => deleteProduct(product.id)" 
+            />
           </div>
         </q-item-section>
         <q-separator spaced />
@@ -58,12 +123,6 @@
 
       <q-dialog v-model="showModal" persistent>
         <q-card style="width: 400px; height: 520px; display: flex; flex-direction: column;">
-          <q-card-section>
-            <div class="text-h6 text-center q-ma-md">{{ selectedItem?.name }}</div>
-            <q-separator spaced />
-            <div class="text-body1"><b>Quantidade: </b>{{ selectedItem?.quantity }}</div>
-            <div class="text-body1"><b>Descrição: </b>{{ selectedItem?.description }}</div>
-          </q-card-section>
 
           <q-space />
           <q-separator spaced />
@@ -80,26 +139,38 @@
 </template>
 
 <script setup lang="ts">
-let dataAtual = new Date()
-
+import { useQuasar } from 'quasar'
 import { ref, onMounted, computed } from "vue";
 import { useProductStore } from "../stores/productStore";
 import type { Product } from "../models/Product";
 import TodoSpinner from "./TodoSpinner.vue";
 import { QForm } from "quasar";
+import { useAuthStore } from "../stores/authStore";
+import { useRouter } from 'vue-router'
 
+let dataAtual = new Date()
+
+const usuarioLogado = ref<{ id: string; nome: string; email: string; password?: string; createdAt: Date } | null>(null)
 const productStore = useProductStore();
 const formRef = ref<QForm | null>(null)
-const form = ref<Product>({ id: "", name: "", description: "", quantity: 0, createdAt: dataAtual });
+const form = ref<Product>({ id: "", name: "", description: "", quantity: 0, createdAt: dataAtual, createdByUser: usuarioLogado!.value?.id! });
 const editId = ref<string | null>(null);
 const showModal = ref(false)
 const selectedItem = ref<Product | null>(null)
 const formattedDate = ref("")
 const search = ref("")
+const auth = useAuthStore();
+const router = useRouter()
+const $q = useQuasar()
+
+onMounted(async () => {
+  usuarioLogado.value = await auth.getUserCurrent()
+  
+  await productStore.getProducts()
+});
 
 function viewProduct(product: Product) {
   selectedItem.value = product
-  showModal.value = true
 
   const date = new Date(selectedItem.value.createdAt)
   formattedDate.value = date.toLocaleString("pt-BR", {
@@ -109,19 +180,42 @@ function viewProduct(product: Product) {
     hour: "2-digit",
     minute: "2-digit"
   })
-}
 
-onMounted(() => {
-  productStore.getProducts()
-});
+  $q.dialog({
+    persistent:true,
+    html: true, 
+    style: "width: 400px; height: 520px; display: flex; flex-direction: column;",
+    title: `<h6 class="text-center q-ma-md">${product.name}</h6> <hr/>`,
+    message: `
+    <div style = "height: 340px">
+      <div style = "margin-bottom: 20px; max-width: 400px; word-break: break-word;">
+        <b>Quantidade:</b> ${product.quantity}<br>
+        <b>Descrição:</b> ${product.description}
+      </div>
+      <div style="margim-top: 100%">
+        <hr/>
+        <div style = "font-style: italic; color: grey; align-items: end;">
+          Criado em ${formattedDate.value}
+        </div>    
+      </div>
+    </div>
+    `,
+    ok: {
+      label: 'Fechar',
+      color: 'primary',
+    },
+  })
+}
 
 function handleSubmit() {
   if (editId.value) {
+    form.value.createdByUser = usuarioLogado.value?.id!
     productStore.editProduct(editId.value, form.value);
   } else {
+    form.value.createdByUser = usuarioLogado.value?.id!
     productStore.addProduct(form.value);
   }
-  form.value = { id: "", name: "", description: "", quantity: 0, createdAt: dataAtual };
+  form.value = { id: "", name: "", description: "", quantity: 0, createdAt: dataAtual, createdByUser: usuarioLogado.value?.id!};
   formRef.value?.reset();
   editId.value = null;
 }
@@ -140,5 +234,10 @@ function editProduct(product: Product) {
 
 function deleteProduct(id: string) {
   productStore.deleteProduct(id);
+}
+
+async function logout(){
+  await auth.logout()
+  router.push('/login')
 }
 </script>
